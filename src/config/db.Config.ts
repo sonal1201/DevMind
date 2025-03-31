@@ -9,7 +9,7 @@ async function connectToDatabase(){
             throw new Error("Please provide MONGO_URI")
           }
          
-        const db = mongoose.connect(process.env.MONGO_URI);
+        const db = await mongoose.connect(process.env.MONGO_URI);
         console.log(db)
         }
         catch (error) {
