@@ -18,7 +18,7 @@ async function createContent(req: Request , res: Response){
         })
 
         if(!isValid){
-            res.status(411).send({
+            res.status(411).json({
                 messgage:"Validation Error"
             })
             return
@@ -55,7 +55,7 @@ async function createContent(req: Request , res: Response){
 
         await newContent.save();
 
-        res.status(200).send({
+        res.status(200).json({
             message: "Content Saved sucessfully",
             content: newContent,
         })
@@ -63,11 +63,40 @@ async function createContent(req: Request , res: Response){
 
     } catch (error) {
         console.log(error);
-        res.status(500).send({
+        res.status(500).json({
             message: "Internal Server Error"
         })
     }
 
+
+}
+
+async function getContent(req: Request, res: Response){
+    const { userId } = req.body;
+    
+    try {
+        const existingUser = await contentModel.findById(userId)
+
+        if(!existingUser){
+            res.status(404).json({
+                message:"User Not Found"
+            })
+            return
+        }
+
+        const userContent = await contentModel.find({userId})
+
+        res.status(200).json({
+            message: "Content Retrieved Successfully",
+            content: userContent
+        })
+
+    } catch (error) {
+        console.log(error)
+        res.status(404).json({
+            message:"External server Error"
+        })
+    }
 
 }
 
@@ -78,7 +107,7 @@ async function deleteContent(req: Request, res: Response){
 
     try {
         if(!validContentId){
-            res.status(404).send({
+            res.status(404).json({
                 message:"Content Not Found!"
             })
             return
@@ -86,13 +115,13 @@ async function deleteContent(req: Request, res: Response){
     
         await contentModel.deleteOne({_id: contentId});
     
-        res.status(200).send({
+        res.status(200).json({
             message: "Content deleted Sucessfully"
         })
 
     } catch (error) {
         console.log(error)
-        res.status(500).send({
+        res.status(500).json({
             message: "External server error"
         })
     }
@@ -101,5 +130,6 @@ async function deleteContent(req: Request, res: Response){
 
 export default{
     createContent,
-    deleteContent
+    deleteContent,
+    getContent
 }
