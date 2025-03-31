@@ -1,11 +1,12 @@
 import express from "express"
 import contentController from "../../controller/content.Controller"
+import { userMiddlerware } from "../../middleware/authMiddleware";
 
 const contentRoute = express.Router()
 
-contentRoute.post('/createContent',contentController.createContent);
+contentRoute.post('/createContent',userMiddlerware,contentController.createContent);
 contentRoute.post('/getContent',contentController.getContent);
-contentRoute.post('/deleteContent',contentController.deleteContent);
+contentRoute.post('/deleteContent',userMiddlerware,contentController.deleteContent);
 
 
 export default contentRoute
