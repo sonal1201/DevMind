@@ -1,5 +1,4 @@
 import express from "express"
-import jwt from "jsonwebtoken"
 import connectToDatabase from "./config/db.Config"
 import apiRouter from "./routes"
 
