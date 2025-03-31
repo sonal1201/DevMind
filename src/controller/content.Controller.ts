@@ -3,6 +3,7 @@ import contentModel from "../model/content.Model";
 import tagModel from "../model/tag.Model";
 import { contentValidator } from "../validator/content.Validator";
 
+
 async function createContent(req: Request , res: Response){
     const {title, content, tags, type, userId, link} = req.body;
 

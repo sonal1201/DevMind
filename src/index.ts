@@ -1,4 +1,5 @@
 import express from "express"
+import { PORT } from "./config/config"
 import connectToDatabase from "./config/db.Config"
 import apiRouter from "./routes"
 
@@ -8,7 +9,7 @@ app.use(express.json())
 
 app.use('/api',apiRouter)
 
-app.listen(3000, async()=>{
+app.listen(PORT, async()=>{
     console.log(":ksdjviudf")
     await connectToDatabase();
 })

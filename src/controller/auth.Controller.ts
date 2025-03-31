@@ -1,6 +1,9 @@
 import { Request, Response } from "express";
 import userModel from "../model/user.model";
 import { userValidation } from "../validator/user.Validator";
+import bcrypt from "bcrypt"
+import jwt from "jsonwebtoken"
+import { JWT_PASSWORD } from "../config/config";
 
 
 async function signup(req: Request, res: Response){
@@ -28,11 +31,14 @@ async function signup(req: Request, res: Response){
             })
             return;
         }
+
+        const saltRound = 10;
+        const hashPasword = await bcrypt.hash(password,saltRound)
         
         const newUser = new userModel({
             username: username,
             email: email,
-            password: password
+            password: hashPasword
         })
 
         await newUser.save();
@@ -67,31 +73,40 @@ async function signin(req: Request, res: Response){
             return;
         }
         
-        const existEmail = await userModel.findOne({
+        const existUser = await userModel.findOne({
             email: email
         })
 
-        if(!existEmail){
+        if(!existUser){
             res.status(404).json({
                 message:" Email Not Found"
             })
             return 
         }
 
-        const existPassword = await userModel.findOne({
-            password: password
-        })
+        const isPasswordValid = await bcrypt.compare(
+            password,
+            existUser.password
+          );
 
-        if(!existPassword){
+        if(!isPasswordValid){
             res.status(404).json({
                 message:"Incorrect Password"
             })
             return 
         }
 
+        const token = jwt.sign(
+            {
+              id: existUser._id,
+            },
+            JWT_PASSWORD
+          );
+
 
         res.status(200).json({
-            message: "User loggedIn successfully..."
+            message: "User loggedIn successfully...",
+            token
         })
 
     } 
