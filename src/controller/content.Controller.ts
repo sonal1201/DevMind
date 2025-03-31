@@ -71,11 +71,35 @@ async function createContent(req: Request , res: Response){
 
 }
 
-// async function deleteContent(req: Request, res: Response){
+async function deleteContent(req: Request, res: Response){
+    const { contentId } = req.body;
 
-// }
+    const validContentId = await contentModel.findById(contentId)
+
+    try {
+        if(!validContentId){
+            res.status(404).send({
+                message:"Content Not Found!"
+            })
+            return
+        }
+    
+        await contentModel.deleteOne({_id: contentId});
+    
+        res.status(200).send({
+            message: "Content deleted Sucessfully"
+        })
+
+    } catch (error) {
+        console.log(error)
+        res.status(500).send({
+            message: "External server error"
+        })
+    }
+}
 
 
 export default{
-    createContent
+    createContent,
+    deleteContent
 }
