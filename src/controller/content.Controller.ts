@@ -1,4 +1,5 @@
 import { Request, Response } from "express"
+import { ErrorBoundary } from "next/dist/client/components/error-boundary";
 import contentModel from "../model/content.Model";
 import tagModel from "../model/tag.Model";
 import { contentValidator } from "../validator/content.Validator";
@@ -75,7 +76,7 @@ async function getContent(req: Request, res: Response){
     const { userId } = req.body;
     
     try {
-        const existingUser = await contentModel.findById(userId)
+        const existingUser = await contentModel.find({userId})
 
         if(!existingUser){
             res.status(404).json({
@@ -84,7 +85,7 @@ async function getContent(req: Request, res: Response){
             return
         }
 
-        const userContent = await contentModel.find({userId})
+        const userContent = await contentModel.find({userId}).populate("userId", "username")
 
         res.status(200).json({
             message: "Content Retrieved Successfully",
@@ -127,9 +128,50 @@ async function deleteContent(req: Request, res: Response){
     }
 }
 
+async function updateCotent(req: Request, res: Response){
+    const { title, content, tag, type, contentId, link} = req.body;
+
+    try {
+        const isContent = await contentModel.findById(contentId);
+
+        if(!isContent){
+            res.status(404).json({
+                message: "Content Not Found"
+            })
+            return
+        }
+
+        const updateContent = await contentModel.findByIdAndUpdate(
+            contentId,
+            {   $set:{
+                    type,
+                    title,
+                    tag,
+                    link,
+                    content
+                },
+            
+            },
+            {new:true}
+        )
+
+        res.status(200).json({
+            message:"Content Updated Successfully",
+            content: updateContent
+        })
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            message: "External Server Error"
+        })
+    }
+}
+
 
 export default{
     createContent,
     deleteContent,
-    getContent
+    getContent,
+    updateCotent
 }
